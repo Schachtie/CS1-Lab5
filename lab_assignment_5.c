@@ -9,15 +9,21 @@ typedef struct node {
 // Returns number of nodes in the linkedList.
 int length(node* head)
 {
-   struct node *tmp = head;
-    int len = 0;
-   while (tmp != NULL)
-   {
-      tmp = tmp->next;
-      len++;
-   }
+	//Check for empty list
+	if (head == NULL)
+	{
+		return 0;
+	}
 
-   return (len);
+	//Traverse list and increment length accordingly
+	node* tempNode = head;
+	int length = 1;
+	while (tempNode->next != NULL)
+	{
+		++length;
+		tempNode = tempNode->next;
+	}
+	return length;
 }
 
 // parses the string in the linkedList
@@ -25,6 +31,31 @@ int length(node* head)
 //  then toCString function wil return "abc"
 char* toCString(node* head)
 {
+	//Get length and allocate appropriate memory space
+	int strLength = length(head);
+	if (strLength == 0)
+	{
+		return NULL;
+	}
+	char* cStr = (char*)calloc(strLength + 1, sizeof(char));
+	if (cStr == NULL)
+	{
+		return NULL;
+	}
+	else
+	{
+		//Traverse list and assign each char from linked list into the c string, append null character at end
+		node* tempNode = head;
+		char* strStart = cStr;
+		do
+		{
+			*cStr = tempNode->letter;
+			tempNode = tempNode->next;
+			++cStr;
+		} while (tempNode != NULL);
+		*cStr = '\0';
+		return strStart;
+	}
 }
 
 // inserts character to the linkedlist
@@ -33,11 +64,53 @@ char* toCString(node* head)
 // head -> |a|->|b|->|c|->|x|
 void insertChar(node** pHead, char c)
 {
+	node* newNode = (node*)calloc(1, sizeof(node));
+	if (newNode != NULL)
+	{
+		//Initalize newNode memebers
+		newNode->letter = c;
+		newNode->next = NULL;
+
+		//Check for empty list
+		if (*pHead == NULL)
+		{
+			*pHead = newNode;
+			return;
+		}
+
+		//Traverse to end of list
+		node* listStart = *pHead;
+		while ((*pHead)->next != NULL)
+		{
+			*pHead = (*pHead)->next;
+		}
+
+		//Add newNode and reset pHead
+		(*pHead)->next = newNode;	
+		*pHead = listStart;	
+	}
 }
 
 // deletes all nodes in the linkedList.
 void deleteList(node** pHead)
 {
+	//Check for empty list
+	if (*pHead == NULL)
+	{
+		return;
+	}
+
+	//Begin freeing each node sequentially
+	node* currentNode = *pHead;
+	node* nextNode = currentNode->next;
+	free(currentNode);
+	while (nextNode != NULL)
+	{
+		currentNode = nextNode;
+		nextNode = nextNode->next;
+		free(currentNode);
+	}
+	*pHead = NULL;
 }
 
 int main(void)
